@@ -1,0 +1,29 @@
+{
+    "name": "chronhub/storm-bureau",
+    "description": "Bureau — Actor VO + boundary identity propagation for Storm",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["ddd", "cqrs", "identity", "actor", "event-sourcing"],
+    "require": {
+        "php": ">=8.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.3.0",
+        "phpstan/phpstan": "^2.2.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Storm\\Bureau\\": "./"
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Storm\\Bureau\\Tests\\": "Tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
