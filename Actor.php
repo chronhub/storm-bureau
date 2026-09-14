@@ -42,10 +42,10 @@ use Storm\Bureau\Exception\InvalidActor;
  * Warning: an Actor is provenance; once stamped on an event it is a permanent, unverifiable
  * audit. Construct it ONLY from a server-resolved principal, the authenticated security user,
  * NEVER from request or user input: this VO cannot tell a trusted claim from a forged one, so a
- * forged Actor becomes an indelible audit lie. Across an async transport the actor is
- * re-materialized from the wire header by the serializer's `decode()` and is therefore only as
- * trustworthy as the channel; recorded provenance inherits the broker's trust boundary, and
- * Storm is currently the sole producer.
+ * forged Actor becomes an indelible audit lie. The neutral transport preserves the actor header
+ * pair as stored provenance, but its `decode()` does not create an ambient `ActorStamp`.
+ * `MessageContext` therefore does not receive an actor from those wire headers. Internal paths
+ * that explicitly trust ambient identity can reconstruct the stamp from the stored pair.
  *
  * Orthogonal to the tenant identity, which lives in the `Message` headers and the Story stamps,
  * never here: who acted and for which tenant are two separate facts.

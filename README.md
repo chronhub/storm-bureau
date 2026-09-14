@@ -22,12 +22,19 @@ stamped on an event, an Actor is a permanent, unverifiable audit.
 
 ## Trust and propagation
 
-The Actor is built ONCE at the boundary (an HTTP controller resolving the security user, a
-consumer entry reading the incoming stamp), rides as an `ActorStamp` on the envelope, travels as
-the `__actor_id` / `__actor_type` header pair, and is read downstream via `MessageContext` —
-never re-resolved from an auth service inside framework or domain code. The pair is ATOMIC at
-every frontier: an enricher writes both or neither, the wire edge and the stamp normalizer refuse
-a lone half (`halfActorIdentity`) — a partial pair is corruption, never "no actor".
+Construct an `Actor` at a trusted application boundary and attach it as an `ActorStamp`.
+Within that message context, downstream code reads the stamp through `MessageContext` rather
+than resolving the principal again. The stored provenance uses the `__actor_id` and
+`__actor_type` header pair.
+
+The neutral transport preserves that pair in `StoredHeaderStamp`, but `decode()` calls
+`ContextStamps::fromMessage` with `trustAmbientIdentity: false`. It does not create an
+`ActorStamp` from the wire headers, so those headers do not establish an ambient actor in
+`MessageContext`. Internal reconstruction paths that explicitly trust ambient identity can
+restore an `ActorStamp` from the pair. Preserving provenance data does not authenticate a sender.
+
+The pair remains atomic: an enricher writes both components or neither, and a partial pair is
+rejected as `halfActorIdentity`, rather than treated as an absent actor.
 
 ## IdentityProvider — the seam, with a load-bearing lifecycle
 
