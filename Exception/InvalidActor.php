@@ -7,10 +7,20 @@ namespace Storm\Bureau\Exception;
 use InvalidArgumentException;
 
 /**
- * Thrown when an `Actor` cannot be constructed: empty, invalid UTF-8, control characters,
- * visually-empty Unicode whitespace, edge separators, or over the byte budget. A construction or caller bug, an
- * `InvalidArgumentException` in the `LogicException` family; fail fast. The alternative is a
- * principal that explodes JSON encoding or pollutes the audit far from this boundary.
+ * Thrown when an `Actor` cannot be constructed.
+ *
+ * A component is refused when it is:
+ *
+ * - Empty
+ * - Invalid UTF-8
+ * - Carrying control characters
+ * - Visually-empty Unicode whitespace
+ * - Edged by a separator
+ * - Over the byte budget
+ *
+ * A construction or caller bug, an `InvalidArgumentException` in the `LogicException` family; fail
+ * fast. The alternative is a principal that explodes JSON encoding or pollutes the audit far from this
+ * boundary.
  */
 final class InvalidActor extends InvalidArgumentException
 {

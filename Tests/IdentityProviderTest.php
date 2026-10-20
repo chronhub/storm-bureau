@@ -12,9 +12,11 @@ use Storm\Bureau\Actor;
 use Storm\Bureau\Testing\FakeIdentityProvider;
 
 /**
- * Pins the port's lifecycle postconditions on the reference implementation, the sequences a
- * signature-conformant-but-leaky provider gets wrong: a refusal or an outage after a success must
- * leave NO actor bound, because the ApiOps audit log records whatever `currentActor()` says.
+ * Pins the port's lifecycle postconditions on the reference implementation.
+ *
+ * These are the sequences a signature-conformant-but-leaky provider gets wrong: a refusal or an outage
+ * after a success must leave no actor bound, because the ApiOps audit log records whatever
+ * `currentActor()` says.
  */
 final class IdentityProviderTest extends TestCase
 {
@@ -32,9 +34,9 @@ final class IdentityProviderTest extends TestCase
     #[Group('adversarial')]
     public function a_refusal_after_a_success_clears_the_bound_actor(): void
     {
-        // the leak the contract forbids: refused credentials returned null while
-        // currentActor() kept exposing the PREVIOUS principal; the audit would have attributed
-        // the next mutation to the wrong actor
+        // the leak the contract forbids: refused credentials return null while `currentActor()`
+        // keeps exposing the previous principal, and the audit attributes the next mutation to the
+        // wrong actor
         $provider = new FakeIdentityProvider(['good' => new Actor('user-123', 'user')]);
 
         $provider->authenticate('good');
@@ -47,7 +49,7 @@ final class IdentityProviderTest extends TestCase
     #[Group('adversarial')]
     public function an_outage_throws_fail_closed_and_leaves_no_actor_bound(): void
     {
-        // an unanswerable backend must THROW, never demote to anonymous, and must not leave the
+        // an unanswerable backend must throw, never demote to anonymous, and must not leave the
         // previous principal dangling either
         $provider = new FakeIdentityProvider(['good' => new Actor('user-123', 'user')], unavailable: ['down']);
 

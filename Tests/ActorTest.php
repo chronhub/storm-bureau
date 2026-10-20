@@ -102,9 +102,9 @@ final class ActorTest extends TestCase
     #[DataProvider('destination_toxic_values')]
     public function refuses_a_value_its_destinations_would_choke_on(string $value, string $why): void
     {
-        // an Actor is copied into JSON headers, audit logs and text columns: what survives
-        // construction must be safe THERE; an invalid byte would otherwise explode json_encode at the
-        // dispatch, far from this boundary
+        // an `Actor` is copied into JSON headers, audit logs and text columns: what survives
+        // construction must be safe there; an invalid byte would otherwise explode `json_encode` at
+        // the dispatch, far from this boundary
         $this->expectException(InvalidActor::class);
 
         new Actor($value, 'user');
@@ -172,7 +172,7 @@ final class ActorTest extends TestCase
     public function rejects_unicode_separators_at_an_identity_edge(string $value): void
     {
         // Do not normalize: merging two durable backend identifiers is as unsafe as keeping two
-        // principals that render alike. The boundary must hand Actor its canonical identifier.
+        // principals that render alike. The boundary must hand `Actor` its canonical identifier.
         $this->expectException(InvalidActor::class);
         $this->expectExceptionMessageIsOrContains('Unicode separator at an edge');
 
@@ -211,7 +211,7 @@ final class ActorTest extends TestCase
     public function a_private_use_codepoint_is_accepted_so_durability_never_rides_the_unicode_table(): void
     {
         // the refusal is exactly the documented rule, control and format characters; refusing the
-        // whole \p{C} would make a DURABLE identity constructible on one host and refused after a
+        // whole `\p{C}` would make a durable identity constructible on one host and refused after a
         // PHP upgrade shipping a newer Unicode table
         $actor = new Actor("backend-\u{E000}-id", 'service');
 

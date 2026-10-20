@@ -12,12 +12,13 @@ use function in_array;
 use function is_string;
 
 /**
- * The REFERENCE implementation of the port's lifecycle postconditions, not a stub that echoes its
- * constructor: every `authenticate()` clears the previously bound actor FIRST, so a refusal or an
- * outage can never leave a stale principal for `currentActor()`; the audit log reads it, and a
- * stale actor there is a wrong principal on a destructive action's audit line. The tests pin these
- * postconditions; a real adapter can mirror this shape or read a naturally-scoped source such as
- * Symfony's token storage.
+ * The reference implementation of the port's lifecycle postconditions, rather than a stub that echoes
+ * its constructor.
+ *
+ * Every `authenticate()` first clears the actor an earlier call bound, so a refusal or an outage can
+ * never leave a stale principal for `currentActor()`; the audit log reads it, and a stale actor there
+ * is a wrong principal on a destructive action's audit line. The tests pin these postconditions; a real
+ * adapter can mirror this shape or read a naturally-scoped source such as Symfony's token storage.
  */
 final class FakeIdentityProvider implements IdentityProvider
 {
@@ -25,7 +26,7 @@ final class FakeIdentityProvider implements IdentityProvider
 
     /**
      * @param  array<string, Actor>  $accepted  credentials this fake accepts, mapped to their Actor
-     * @param  list<string>  $unavailable  credentials that simulate a backend OUTAGE; fail closed
+     * @param  list<string>  $unavailable  credentials that simulate a backend outage; fail closed
      */
     public function __construct(
         private readonly array $accepted = [],
@@ -34,8 +35,8 @@ final class FakeIdentityProvider implements IdentityProvider
 
     public function authenticate(mixed $credentials): ?Actor
     {
-        // the postcondition, enforced FIRST: whatever happens below, refusal, outage, or success,
-        // currentActor() ends up being exactly this call's outcome, never the previous cycle's
+        // the postcondition, enforced first: whatever happens below, refusal, outage, or success,
+        // `currentActor()` ends up being exactly this call's outcome, never the previous cycle's
         $this->actor = null;
 
         if (! is_string($credentials)) {
@@ -50,7 +51,7 @@ final class FakeIdentityProvider implements IdentityProvider
             return $this->actor = $this->accepted[$credentials];
         }
 
-        return null; // refused credentials: the ONLY meaning of null
+        return null; // refused credentials: the only meaning of null
     }
 
     public function currentActor(): ?Actor
